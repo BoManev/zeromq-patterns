@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  redis:
+    image: redis:latest
+    container_name: my-redis-container
+    ports:
+      - "8002:6379"
+  sync:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - async
+    command: ["uvicorn", "--host", "0.0.0.0", "--app-dir", "./src", "sync:app"]
+  
+  async:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["python", "-u", "src/async.py"]
